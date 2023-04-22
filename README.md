@@ -497,18 +497,18 @@ for i = 0 to v-1 {
 ![image](https://user-images.githubusercontent.com/122314614/233799601-cb7efede-d129-461e-8402-e7b570c7c329.png)
 * Must insert all e edges into the priority queue
   * In the worst case we'll also have to remove all e edges
-* Runtime: Θ(e ln e)
+* Runtime: Θ(e lg e)
 
 #### Comparison of Prim's Implementations
 * Parent/Best edge array Prims:
   * Runtime: Θ(v<sup>2</sup>)
   * Space: Θ(v)
 * Lazy Prim's:
-  * Runtime: Θ(e ln e)
+  * Runtime: Θ(e lg e)
   * Space: Θ(v)
   * Requires a PQ
 * Eager Prims:
-  * Runtime: Θ( e ln v)
+  * Runtime: Θ( e lg v)
   * Space Θ(v)
   * requires an indexable PQ  
 
@@ -518,6 +518,106 @@ for i = 0 to v-1 {
 * Remove it from the PQ and add it to the MST
 ![image](https://user-images.githubusercontent.com/122314614/233799872-b312feef-f570-4c4b-a222-ac4f2d6e3cfa.png)
 
+#### Kruskals Pseudocode
+* Insert all *e* edges into a PQ
+* T = an empty set of edges
+* Repeat until T contains v-1 edges
+  * Remove a min edge from the PQ
+  * Add the edge to T if the edge does not create a cycle in T
+* return T  
+
+#### Kruskal's Runtime
+* Instead of building up the MST starting from a single vertex, we build it up using edges all over the graph
+* How to implement cycle detection
+  * BFS/DFS
+    * v + e
+  * Union/find data Structure (NOT COVERED)
+    * log v
+* **Total Runtime: Θ(e log v)** (same as Prim's
+
+### Dijkstra's Algoritm
+* distance[]: Best known shortest distance from start to each vertex
+* distance[start] = 0
+* distance[x] = Double.POSITIVE_INFINITY for other vertices
+* Dijkstra's is only correct when all edge weights >= 0
+
+#### Dijsktra's Pseudocode
+* cur = start
+* While destination not visited 
+  * For each unvisited neighbor x of cur 
+    * Compute shortest distance from start to x through cur
+      * = distance[cur] + weight of edge from cur to x
+    * Update distance[x] if distance through cur < distance[x]
+  * Mark cur as visited
+  * cur = an unvisited vertex with the smallest distance
+![image](https://user-images.githubusercontent.com/122314614/233805102-79927838-d0e3-43de-aa3c-523ae8fdf528.png)
+* The distance array keeps track of the best path from the start
+  * Compare to best edge array in Prim's
+* Once a vertex is visited, its distance value **doesn't change**
+* Parent array used to construct shortest path
+
+#### Dijsktra's Runtime
+* Depends on implementation
+  * Distance and Parent arrays: Θ(v<sup>2</sup>
+  * Priority Queue: Θ(e log v)
+* Algorithm may stop earlier when destination visited
+
+#### Bi-Directional search
+* Start two instances of Dijkstra's possibly in parallel
+  * From source on original graph
+  * From destination, on reverse graph
+* When processing an edge to a vertex visited by the other instance, update shortest known distance between start and destination
+* Stop when tops of both heaps give a distance >= sortest known  
+
+#### A* Search
+* Use lower bound estimates for the distance of the rest of the path to destination
+  * Pick vertex with minimum distance[v] + estimate[v]
+* Lower bound estimates using landmarks and triangual inequality
+* Requires preprocessing to compute and store distnaces from each vertex to each landmark
+
+### Bellman-Ford's Algorithm (and negative edge weights)
+* distance[v] = Double.POSITIVE_INFINITY (for all vertices except start)
+* distance[start] = 0
+* Runtime: O(v * e)
+
+#### Bellman-Ford Pseudocode
+``` java
+repeat v-1 times {
+  for each vertex cur {
+    for each neighbor x of cur {
+      compute shortest distance from start to x via cur
+        = distance[cur] + weight of cur(cur, x)
+       if computed distance < distance[x]
+         Update distance[x] and parent[x]
+    }
+  }
+}
+``` 
+
+#### BMF Optimization
+* initialize a FIFO (first in, first out) Queue Q. 
+  * Pop a vertex *cur* from Q and if computed distance < distance[x], then add x to Q if it isn't already there 
+![image](https://user-images.githubusercontent.com/122314614/233805917-9a46c3e0-3b2c-44d0-b699-e6e2ad084ade.png)
+* Bellman-Ford's is correct event when there are negative edge weights in the graph
+
+#### Negative Cycles
+* BMF won't terminate if a negative cycle exists
+* Finding a negativ cycle:
+  * For each vertex cur:
+    * For each neighbor x of cur
+      * Compute shortest distance from start to x via cur
+        = distance[xur] + weight of (cur, x)    
+      * if computed distance < distance[x]
+        * Update distance[x] and parent[x]
+* If another iteration results in update of distance[v] for a vertex v, then v is in a negaitve cycle
+* To detect a negative cycle reachable from the start:
+  * Build a graph using parent to child links set by BMF
+  * Modify DFS to detect if a cycle exists
+    * If a neighbor is already visited and is on the runtime stack
+      * We have a cycle
+      * follow parent links until back to current node
+      * Add up edge weights
+      * If negative, stop; otherwise continue    
 
 ## Priority Queues
 
