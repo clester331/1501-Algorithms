@@ -715,9 +715,298 @@ class CardPrice implements Comparable<CardPrice>{
 }
 ```
 
-## Greedy Algorithms
-
 ## Memoization And Dynamic Programming Algorithms
+
+### Fibonacci
+* To account for all subproblems in the fibonacci program, we can use two different solutions to avoid running into the same subproblem
+* Memoization Solution:
+  * efficient: solves each subproblem only once
+  * Still recursive
+* Dynamic Programming:
+  * Efficient: Also solves each subproblem only once
+  * Iteratice
+  * Allows for space optimization
+
+#### Fibonacci Pseudocodes
+```java
+int[] F = new int[n+1];
+F[0] = 0;
+F[1] = 1;
+for(int i = 2; i <= n; i++) { F[i] = -1 };
+
+int fib_mem(n) {
+  if (F[n] == -1) {
+    F[n] = fib_mem(n-1) + fib_mem(n-2);
+  }
+  return F[n];
+}
+```
+* Bottom-up approach
+```java
+int[] F = new int[n+1];
+F[0] = 0;
+F[1] = 1;
+
+int bottomup_fib(n) {
+  for(int i = 2; i <= n; i++) {
+    F[i] = F[i-1] + F[i-2];
+  } 
+  return F[n];
+}
+```
+* Improved Botton-up approach
+```java
+int improve_bottomup_fib(n) {
+  if (n == 0) return 0;
+  if (n == 1) return 1;
+  int prev = 0; int cur = 1;
+  for (int i = 0; i < n; i++){
+    int new = prev + cur;
+    prev = cur;
+    cur = new;
+  }
+  return cur;
+}
+```
+
+### Dynamic Programming
+* Avoid solving the same sub-problem twice
+* Iterative:
+  * Start with smaller subproblems then larger subproblems
+* Sometimes possible to optimize space needed  
+
+#### DP Steps
+* What is the first decision to make to solve the problem?
+  * For fibonacci: add fib(n-1) + fib(n-2)
+* What subproblem(s) emerge out of that first decision?
+  *   fib(n-1) and fib(n-2)
+* You must wait for subproblem solutions to make the first decision
+
+* Start with recursive solution
+* If inefficient, do you have overlapping subproblms
+* Identify unique subproblems
+* Allocate array to hold their solutions
+* Solve them from bottom-up smaller to larger
+* Optimize space if possible
+
+### Knapsack Problem
+* A knapsack can hold a weight limit *L*
+* A set of n item types
+  * Each item has a weight (w<sub>i</sub>) and value (v<sub>i</sub>) 
+  * Unbounded supply of all types
+* Goal: Find the **maximum value** we can fit in the knapsack 
+* ![image](https://user-images.githubusercontent.com/122314614/233852260-ddba6964-fc9b-4dd0-bfc4-3c53909d6bf2.png)
+
+### Greedy Algorithms
+* Greedy Algorithms are algorithms that make a choice that **seems to be the best at the moment. It does not wait for subproblem solutions*
+* Examples
+  * Huffamn Tries
+  * Prim's MST 
+
+#### Knapsack example for greedy algorithms
+* Goal is to add as many copies of the **highest value per pound item** as possible
+  * **Water: 30/6 = 5**
+  * Rope: 14/3 = 4.66
+  * Flashlight: 16/4 = 4
+  * Moon Pie: 9/2 = 4.5 
+* Highest value per pound item is water. Add that first
+  * Can fit 1 item with 4 spaces left over
+* Next highest value item: Rope
+  * an fit 1 with 0 space left over
+* No more room for anything else
+* Total value in 10 lb. knapsack: 44    
+* Greedy algorithm does not work for this problem
+  * No optimal solution includes the locally optimal choices made by the greedy algorithm 
+
+#### Knapsack recursive solution psuedocode
+```java
+int knapSack(int[] wt, int[] val, int L) {
+  if (L == 0) { return 0 };
+  int maxValue = 0;
+  for(int i=0; i < n; i++){
+    if (wt[i] <= L) {
+      value = val[i] +
+        knapSack(wt, val, L-wt[i]);
+      if (value > maxValue) maxValue = value;
+    }
+  }
+  return maxValue;
+}
+```
+* Updated problem with recusrive solution
+![image](https://user-images.githubusercontent.com/122314614/233852601-46f3f554-c4fe-4966-ac0c-7c37ac203991.png)
+* Allocate a 2D array to hold all possible solutions
+  * K[] with size L, the knapsack capacity
+* Solve them from bottom-up smallest to largest
+  * K[i] holds the mxaimum value possible with a knapsack of capacity *i*   
+
+* Bottom-up solution
+```
+K[0] = 0
+for (l = 1; l <= L; l++) {
+  int max = 0;
+  for (i = 0; i < n; i++) {
+    if (wi <= l && vi + K[l - wi]) > max) {
+      max = vi + K[l - wi];
+    }
+  }
+  K[l] = max;
+}
+```
+![image](https://user-images.githubusercontent.com/122314614/233852792-2d49d839-e178-4c28-ad46-18ddc7b7acdb.png)
+
+### 0/1 Knapsack Problem
+* A finite set of items each witha weight and value
+  * Two choices for each item
+    * goes in the knapsack or gets left out
+* First decision
+  * to place or not place the first item (or last item)
+* item placed -> one less item and capacity less by item's wieight
+* item not placed -> one less item and same capacity
+* **Basically: we can't resue items**
+
+#### 0/1 Psesudocode (Recursive)
+```java
+int knapSack(int[] wt, int[] val, int L, int n) {
+  if (n == 0 || L == 0) { return 0 };
+  //try placing the (n-1)st item
+  if (wt[n-1] > L) { //cannot place
+    return knapSack(wt, val, L, n-1)
+} else {
+  return max( val[n-1] + knapSack(wt, val, L-wt[n-1], n-1),
+    knapSack(wt, val, L, n-1)
+    );
+  }
+}
+```
+![image](https://user-images.githubusercontent.com/122314614/233853388-4d888ac2-c6dc-438f-bbc6-823005f11010.png)
+#### 0/1 Pseudocode (Dynamic)
+```java
+int knapSack(int wt[], int val[], int L, int n) {
+  int[][] K = new int[n+1][L+1];
+  for (int i = 0; i <= n; i++) {
+    for (int l = 0; l <= L; l++) {
+      if (i==0 || l==0){ K[i][l] = 0 };
+      //try to add item i-1
+      else if (wt[i-1] > l){ K[i][l] = K[i-1][l] };
+      else {
+        K[i][l] = max(val[i-1] + K[i-1][l-wt[i-1]],
+                  K[i-1][l]);
+       }
+    }
+  }
+  return K[n][L];
+}
+```
+
+![image](https://user-images.githubusercontent.com/122314614/233853568-eec11eac-0759-4be9-b725-c3589271f157.png)
+* **For this graph - Start at the first item (weight/value), find a spot on the column where the weight matche the column number and add the value to the row/col. Add up weights only using the current item and any ones before it**
+
+### Change-Making Problem (Greedy)
+* What is the minimum number of coins needed to make up a give change value **k >= 0**?
+* Fore greedy algorithms to produce optimal results, problems must have two properties:
+  * Optimal Substrucure: optimal solution to a subproblem leads to an optimal solution for the overall problem 
+    * Best way to make change for 3 cents -> Best way to make change for 6 cents
+  * Greedy Choice Property: Globally optimal solutions assembled from locally optimal choices
+    * K = 6: for US corrency, the bset overall choice would be to use the biggest coin (nickel)
+    * With thrickles/fourters, we can't know until we've looked at all possible breakdowns
+
+### Subset Sum
+* Problem: Given a set of **non-negative integers** S and a **target sum** k, is there a subset of S that sums to exactly k?
+![image](https://user-images.githubusercontent.com/122314614/233854155-dfcc794c-fe6e-4db8-8d86-cb335adb96fe.png)
+
+#### Subset sum recursive pseudocode (I realize that none of this is actually pseudocode but i'm to lazy to change these names)
+```java
+boolean SSS(int set[], int sum, int n) {
+  //base cases
+  if (sum == 0)
+    return true;
+  if (sum != 0 && n == 0)
+    return false;
+  //can we include item n-1?
+  if (set[n-1] > sum)
+    return SSS(set, sum, n-1);
+  //should we include item n-1?
+  return SSS(set, sum, n-1) ||
+    SSS(set, sum-set[n-1], n-1);
+}
+```
+![image](https://user-images.githubusercontent.com/122314614/233854265-bd41bc11-f855-48e8-9438-b1ba77ffe6a0.png)
+* Subset[i][j] is true iff a subset of the first *i* items sums up to *j*
+* **The next column in row i will be true until j > Sum of the set (i.e [1, 2, 3, 4], row is true until j = 11)
+
+#### Subset sum bottom-up algorithm
+```java
+boolean SSS(int set[], int sum, int n) {
+  boolean[][] subset = new boolean[n+1][sum+1];
+  //easy cases
+  for (int i = 0; i <= n; i++) subset[i][0] = true;
+  for (int i = 1; i <= sum; i++) subset[0][i] = false;
+  
+  for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= sum; j++) {
+    if (j >= set[i-1])
+      subset[i][j] = subset[i-1][j] ||
+                     subset[i–1][j-set[i-1]];
+    else subset[i][j] = subset[i-1][j];
+    }
+  }
+  return subset[n][sum];
+}
+```
+
+### Edit Distance
+* Given two strings
+  * a string S of length n
+  * a string T of length m
+* Find a minimum number of edits to convert S to T
+  * Called Levenshtein Distance (LD)
+* Possible Edits
+  * Change a character
+  * Delete a character
+  * Insert a character
+
+#### ED Example
+* Example: "WEASEL" -> "SEASHELL"
+  * For "WEASEL":
+    * Change W to S
+    * Add an H in position 5
+    * Add an L in position 8
+    * **Results in "SEASHELL"**
+      * If we reverse the arguments, we get the same distance from T to S (but the edits may be different)
+
+#### ED Pseudocode
+* We want to calculate D(S, T) where n is the length of S and m is the length of T
+  * If n = 0 //BASE CASE 1
+    * Return m (m appends will create T from S)
+  * else if (m = 0) //BASE CASE 2
+    * return n (n deletes will create T from S)
+  * else
+    * Consider character n of S and character m of T 
+* If characters match
+  * Result is the same as for strings with last characters removed (since they match
+  * **Return D(n-1, m-1)
+  * Recursively solve the prolem with both strings one character smaller
+* If characters do not match
+  * Change X to Y, then recursively solve the same problem but with both strings one character smaller
+  * **Return D(n-1, m-1) + 1**
+
+* We do not know which of these gives the minimum distance until we try them all
+* We must try all subproblems and choose the one that vies the minimum result  
+      
+![image](https://user-images.githubusercontent.com/122314614/233855099-86aaefb9-109f-4837-872f-e381e12d5d8e.png)
+* D[i][j] is the minimum distance between the first i letters of S and the first j letters of i
+
+* D[i, j] = D[i-1, j-1] if we have a match
+* When we have a mismatch, minimum of the cells
+  * D[i-1, j-1] + 1
+    * Change char at this point in S
+  * D[i-1, j] + 1
+    * Delete a char from S
+  * D[i, j-1] + 1
+    * Append a char to S 
+* **Edit Distance Runtime: Θ(mn)**
+
 
 ## Lloyd's Algorithm For k-means and K-means++
 
