@@ -1007,7 +1007,60 @@ boolean SSS(int set[], int sum, int n) {
     * Append a char to S 
 * **Edit Distance Runtime: Θ(mn)**
 
+### Longest Common Subsequence
+* Given two sequences, return the longest common subsequence
+* Ex:
+  * A **Q** S R **J** K **V** B **I**
+  * **Q** B W F **J** **V** **I** T U  
 
+#### LCS Code
+```
+int LCSLength(String x, String y) {
+  int[][] m = new int[x.length + 1][y.length + 1];
+  for (int i=0; i <= x.length; i++) {
+    for (int j=0; j <= y.length; j++) {
+      if (i == 0 || j == 0) m[i][j] = 0;
+      if (x.charAt(i) == y.charAt(j))
+        m[i][j] = m[i-1][j-1] + 1;
+      else
+        m[i][j] = max(m[i][j-1], m[i-1][j]);
+    }
+  }
+  return m[x.length][y.length];
+}
+```
+
+### Reinforcement Learning
+* A type of machine learning
+  * An agent (like a robot) learns an optimal policy only by getting rewards from the environment 
+
+![image](https://user-images.githubusercontent.com/122314614/233856712-90c787c0-7048-4a1b-8df7-ffff2a906907.png)
+
+* Markov Decision Process:
+  * A set of states 
+    * Maze locations, agent healt
+  * A set of agent actions
+    * Move left, move right
+  * Probabilites of ending up in a state given a current state and an action
+  * Reward function
+  * Starting state    
+
+* An agent policy determines the probability of taking an action given a state
+* An optimal policy gives the maximum total reward
+* Expected reward from an action depends on
+  * immediate reward
+  * values of states reachable through the action
+  * Sum_{all states}:
+    * Prob of reaching state * state value  
+
+#### Using Dynamic Programming to Solve an MDP
+* Data Structure: Array of state values
+* Step 0: Start with an initial policy and initial state values
+  * e.g., all actions equally likely and state values = 0
+* Step 1: Compute expected state values
+ * optional: iterate until values converge
+* Step 2: Modify policy to take the best action with probability 1.0 (given the current state values)
+* Repeat Step 1 and 2 until policy converges
 ## Lloyd's Algorithm For k-means and K-means++
 
 
