@@ -619,6 +619,98 @@ repeat v-1 times {
       * Add up edge weights
       * If negative, stop; otherwise continue    
 
+### Network Flow
+* Directed, weighted graph G(V, E)
+  * Weights are applied to edges to state their capacity
+    * c(u, w) is the weight capacity of edge (u, w)
+    * If there is no edge from u to w, c(u, w) = 0
+  * Consider two vertices, a source *s* and a sink *t*
+    * determing maximum flow from s to t in G   
+
+#### Flow
+* f(u, w): amount of flow carried along the edge (u, w)
+* some rules on the flow running through an edge
+  * **f(u, w) <= c(u, w)
+  * Incoming flow = outgoing flow
+
+#### Residual Capacity
+* Residual capacity of edge (u, w) is c(u, w) - f(u, w)
+  * **Capacity - flow**
+  * residual capacity in the graph below of edge (S, A) is 1000 - 100 = 900
+![image](https://user-images.githubusercontent.com/122314614/233874380-1d7614e4-e7b1-4bd2-a9a9-d28baa4afccf.png)
+
+#### Augmenting Path
+* An augmenting path is a simple path from the source to the destination
+* all edges in p have some residual capacity
+* Ex: in above image
+![image](https://user-images.githubusercontent.com/122314614/233874644-5fe61dba-cc67-496a-80bb-37d7009e5be1.png)
+
+#### Ford Fulkerson
+* Initially: f(u, w) = 0 for all edges in E
+* While an augmenting path p exists
+  * Find an edge with **minimum residual capacity** in p
+    * Call this minimum residual capacity *new flow*
+  * Increase the flow on all edges in p by *new_flow*
+![image](https://user-images.githubusercontent.com/122314614/233874772-56e1ee28-7acc-4790-aa28-a0fabbd3b206.png)
+
+* If maximum flow can't be reached: consider re-routing the previously allocated flow
+* When finding an augmenting path, look only at the edges of G, but also at backwards edges that allow such re-reouting
+* Runtime: O(2<sup>|f|</sup> * (e + V))
+
+#### Backwards Edge
+* For each edge (u, w) that exists with f(u, w) > 0, a backwards edge (u, w) exists
+* The capacity of the backwards edge (w, u) = f(u, w)
+* Adding flow to a backwards edge means re-routing flow from the corresponding forward edge
+
+#### Residual graph
+* Searches for augmenting path on a residual graph
+* The residual graph is made up of:
+  * V
+  * An edge for each (u, w) in E, where f(u, w) < c(u, w)
+  * A backwards edge for each (u, w) in E where f(u, w) > 0 
+
+#### Edmonds Karp
+* Uses BFS to find augmenting paths
+* Runtime: O(e<sup>2</sup>v)
+* Finds spanning trees and shortest paths for unweighted graphs
+
+##### Maximum Capacity Path
+* Implemented by modifying Dijkstras shortest paths algorithm
+* Define flow[v] as the maximium amount of flow from s -> v along a single path
+* Each iteration, set curr as an unmarked vertex with the largest flow
+* for each neighbor w of curr:
+  * If **min(flow[curr], residual capacity of edge (curr, w))** > flow[w] 
+    * Update flow[w] and parent[w] to be curr 
+
+#### Flow Edge implementation
+* For each edge, we need to store:
+  * from vertex
+  * to vertex
+  * edge capacity
+  * edge flow
+  * residual capacities
+    * For forwards and backwards edges
+
+#### Push-Relable Algorithm for Max Flow
+* More efficient that Edmonds-Karp that uses BFS
+  * Runtime: Θ(v<sup>3</sup>
+* Local per vertex operations instead of global updates
+* Each vertex has a height and excess flow value 
+
+* Push Operation:
+  * Flow pushed from higher vertex to lower neighbor
+  * Height difference of 1 or more
+  * Over an edge with residual capacity > 0
+* Relable Operation
+  * If a vertex's excess flow > 0 and has no lower neighbor
+    * Relable vertex's height to
+      * 1 + min height of neighbors able to recieve flow
+* Repeat relabel and push operation until
+  * All vertices except source and sink have 0 excess flow 
+
+#### Push-Relable Pseudocode
+![image](https://user-images.githubusercontent.com/122314614/233875779-8aebfe96-d4e3-412d-966f-746179943c0f.png)
+
 ## Priority Queues
 
 ### ADT Priority Queue
@@ -1061,6 +1153,7 @@ int LCSLength(String x, String y) {
  * optional: iterate until values converge
 * Step 2: Modify policy to take the best action with probability 1.0 (given the current state values)
 * Repeat Step 1 and 2 until policy converges
+* 
 ## Lloyd's Algorithm For k-means and K-means++
 
 
