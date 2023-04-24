@@ -1,0 +1,14 @@
+# Chapter 13 - CPU Intro
+
+## ISA Hardware and design
+* *ISA - The software interface the programmers use to control the CPU*
+  * The ISA specifies the software interface to the CPU
+
+* *Microarchitecture - The hardware design of a physical CPU*
+  * Microarchitecture is an implementation of an ISA
+  
+##CPU Organization
+* Major parts of the CPU
+  * *Control - Tells everything else what to do and when*
+  * *Registers - Hold the values being computed*
+  * *ALU - computes new value*
