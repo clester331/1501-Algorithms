@@ -711,6 +711,34 @@ repeat v-1 times {
 #### Push-Relable Pseudocode
 ![image](https://user-images.githubusercontent.com/122314614/233875779-8aebfe96-d4e3-412d-966f-746179943c0f.png)
 
+#### Finding Bottleneck edges
+* An st-cut on G is a set of edges in G that, if removed, will partition the vertices into two disjoint sets
+  * One contains S and one contains T 
+  * Minimum ST cut = an ST cut with the smallest edge capacities
+
+#### Bipartite Matching
+* Bipartate Grapg: vertices decomposed into two disjoint sets such that no two verticies within the same set have an edge between them
+
+#### Graph Compression
+* Step 1: Construct a Compressed Sparse Row (CSR) representation of the graph
+  * CSR
+    * Edges array concatenates sorted neighbor lists of all vertices
+    * Offsets array: offsets[v] is the starting index (in the edges array) for the neighbors of vertex v  
+
+![image](https://user-images.githubusercontent.com/122314614/234722860-cc792490-2165-4985-8bdd-20706d5fb05b.png)
+  * Runtime: Θ(v + e)
+  * Total size: 4 * v + 8 * e bytes
+* Step 2: Difference Decoding
+  * For each vertex v, with a neighbor list v<sub>1</sub> v<sub>2</sub> v<sub>3</sub> 
+    * Store the differences between each two consecutive numbers
+      * (v<sub>1</sub> - v) (v<sub>2</sub> - v<sub>1</sub>) - (v<sub>3</sub> - v<sub>2</sub>)
+![image](https://user-images.githubusercontent.com/122314614/234724736-cbcc45a7-75e9-441b-a52f-4b6b4f8d8d6c.png)
+* Step 3: Use Gamma Code to compress the differences
+  * Compresses data when small values much more frequent than large values
+    * T = Largest power 2 < x
+    * Encode T as (log T) zeroes followed by 1
+    * Append the remaining (log T) bits of x - T
+    * Need 2 * floot(log x) + 1 bits << 32 for small x 
 ## Priority Queues
 
 ### ADT Priority Queue
@@ -720,6 +748,9 @@ repeat v-1 times {
     * findMin() / findMax()
   * Remove an item with highest priority
     * removeMix() / removeMax()
+
+![image](https://user-images.githubusercontent.com/122314614/234725059-0c23ab4c-7b29-4962-bd22-ab4b329fc67b.png)
+
 
 #### Implementations
 |Type          |findMin|removeMin|insert |
@@ -1153,10 +1184,26 @@ int LCSLength(String x, String y) {
  * optional: iterate until values converge
 * Step 2: Modify policy to take the best action with probability 1.0 (given the current state values)
 * Repeat Step 1 and 2 until policy converges
-* 
+
 ## Lloyd's Algorithm For k-means and K-means++
 
+### Lloyd's Local Search
+* Initialization:
+  * Start with an initial cluster assignment
+  * Compare initial cluster centroids
+* Repeat until no change in centroids and cluster assignments
+  * Assign each data point to the closest cluster centroid
+  * Recompute cluster centroids based on new assignment
+* Limitations:
+  * Sensitive to initial clustering
+  * Fix: select initial centroids as far from each other as possible
 
+### K-Means++ Algorithm for Initial Centroids
+* Select first centroid with uniformity probability over all data
+* Repeat for each of the remaining K-1 initial centroids
+  * For each data point
+    * Compute distance to nearest centroid
+  * Select next centroid with probability that favors data points with larger distance
 
 
  
